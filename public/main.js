@@ -80,6 +80,10 @@ let cameraControlsActive = true; // Camera status
 const selectedObjects = [];
 const raycaster = new THREE.Raycaster();
 
+// Arrays to hold points for the line
+const linePoints = [];
+let line;
+
 document.addEventListener('mousedown', onMouseDown);
 pencilIcon.addEventListener('click', toggleCameraControl);
 
@@ -93,6 +97,14 @@ function toggleCameraControl() {
       controls.enableZoom = true; // Allow camera zoom
       controls.enablePan = true; // Allow camera panning
       console.log("Camera controls enabled.");
+
+      // Clear the line when camera controls are enabled
+      if(line){
+        scene.remove(line);
+        line = null;
+        linePoints.length = 0;
+        console.log("Line cleared");
+      }
   } else {
       controls.enableRotate = false; // Disable camera rotation
       controls.enableZoom = false; // Disable camera zoom
@@ -121,17 +133,33 @@ function onMouseDown(event) {
               const color = new THREE.Color(Math.random(), Math.random(), Math.random());
               selectedObject.material.color = color;
               console.log(`${selectedObject.name} was selected!`);
+              const point = intersections[0].point; // Get clicked point
+              linePoints.push(point);
           } else {
               selectedObjects.splice(index, 1);
               selectedObject.material.color.set(0xffffff); // Resetting to default color
               console.log(`${selectedObject.name} was deselected!`);
           }
-
+          // Draw the line when object selection is enabled
+          drawLine();
           printSelectedObjects();
       }
   } else {
       console.log("Camera controls are enabled. Object selection is disabled.");
   }
+}
+
+function drawLine(){
+  const geometry = new THREE.BufferGeometry().setFromPoints(linePoints);
+  const material = new THREE.LineBasicMaterial({color: 0xff0000});
+  line = new THREE.Line(geometry, material);
+
+  // Femove the previous line if it exists
+  if(scene.getObjectByName('drawingLine')){
+    scene.remove(scene.getObjectByName('drawingLine'));
+  }
+  line.name = 'drawingLine'; // Set a name for easy removal later
+  scene.add(line); // Add the line to the scene
 }
 
 function printSelectedObjects(){
