@@ -75,24 +75,66 @@ scene.add(boxes);
 animate();
 
 // ========= END SCENE SETUP =========
-
+const pencilIcon = document.getElementById('pencil-icon');
+let cameraControlsActive = true; // Camera status
+const selectedObjects = [];
 const raycaster = new THREE.Raycaster();
 
 document.addEventListener('mousedown', onMouseDown);
+pencilIcon.addEventListener('click', toggleCameraControl);
+
+// Add the toggleCameraControl function
+function toggleCameraControl() {
+  cameraControlsActive = !cameraControlsActive; // Toggle state
+
+  // Enable or disable camera controls
+  if (cameraControlsActive) {
+      controls.enableRotate = true; // Allow camera rotation
+      controls.enableZoom = true; // Allow camera zoom
+      controls.enablePan = true; // Allow camera panning
+      console.log("Camera controls enabled.");
+  } else {
+      controls.enableRotate = false; // Disable camera rotation
+      controls.enableZoom = false; // Disable camera zoom
+      controls.enablePan = false; // Disable camera panning
+      console.log("Camera controls disabled.");
+  }
+}
 
 function onMouseDown(event) {
-  const coords = new THREE.Vector2(
-    (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
-    -((event.clientY / renderer.domElement.clientHeight) * 2 - 1),
-  );
+  // Only allow object selection if camera controls are disabled
+  if (!cameraControlsActive) {
+      const coords = new THREE.Vector2(
+          (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
+          -((event.clientY / renderer.domElement.clientHeight) * 2 - 1),
+      );
 
-  raycaster.setFromCamera(coords, camera);
+      raycaster.setFromCamera(coords, camera);
+      const intersections = raycaster.intersectObjects(scene.children, true);
 
-  const intersections = raycaster.intersectObjects(scene.children, true);
-  if (intersections.length > 0) {
-    const selectedObject = intersections[0].object;
-    const color = new THREE.Color(Math.random(), Math.random(), Math.random());
-    selectedObject.material.color = color;
-    console.log(`${selectedObject.name} was clicked!`);
+      if (intersections.length > 0) {
+          const selectedObject = intersections[0].object;
+          const index = selectedObjects.indexOf(selectedObject);
+
+          if (index === -1) {
+              selectedObjects.push(selectedObject);
+              const color = new THREE.Color(Math.random(), Math.random(), Math.random());
+              selectedObject.material.color = color;
+              console.log(`${selectedObject.name} was selected!`);
+          } else {
+              selectedObjects.splice(index, 1);
+              selectedObject.material.color.set(0xffffff); // Resetting to default color
+              console.log(`${selectedObject.name} was deselected!`);
+          }
+
+          printSelectedObjects();
+      }
+  } else {
+      console.log("Camera controls are enabled. Object selection is disabled.");
   }
+}
+
+function printSelectedObjects(){
+  const selectedNames = selectedObjects.map(obj => obj.name);
+  console.log('Selected Objects', selectedNames);
 }

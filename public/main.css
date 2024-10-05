@@ -31,3 +31,56 @@ body {
 .color-button.selected {
   outline: 3px solid white;
 }
+
+
+
+#pencil-icon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  cursor: pointer;
+}
+.Btn#pencil-icon{
+  /* position: relative; */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100px;
+  height: 40px;
+  border: none;
+  padding: 0px 20px;
+  background-color: black;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 10px;
+  box-shadow: 5px 5px 0px black;
+  transition-duration: 0.3s;
+}
+
+#pencil-icon .svg {
+  width: 13px;
+  position: absolute;
+  right: 0;
+  margin-right: 20px;
+  fill: white;
+  transition-duration: 0.3s;
+}
+
+.Btn#pencil-icon:hover {
+  color: transparent;
+}
+
+.Btn#pencil-icon:hover svg {
+  right: 43%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  transition-duration: 0.3s;
+}
+
+.Btn#pencil-icon:active {
+  transform: translate(3px, 3px);
+  transition-duration: 0.3s;
+  box-shadow: 2px 2px 0px white;
+}
