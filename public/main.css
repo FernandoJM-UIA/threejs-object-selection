@@ -84,3 +84,85 @@ body {
   transition-duration: 0.3s;
   box-shadow: 2px 2px 0px white;
 }
+
+.bin-button#deleteDrawn{
+  position: absolute;
+  top: 17px;
+  left: 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 7%;
+  background-color: rgb(255, 95, 95);
+  cursor: pointer;
+  border: 1px solid rgb(255, 201, 201);
+  transition-duration: 0.3s;
+}
+.bin-bottom#deleteDrawn {
+  width: 150px;
+}
+#deleteDrawn .bin-top {
+  width: 9px;
+  transform-origin: right;
+  transition-duration: 0.3s;
+}
+.bin-button#deleteDrawn:hover .bin-top {
+  transform: rotate(45deg);
+}
+.bin-button#deleteDrawn:hover {
+  background-color: rgb(255, 0, 0);
+}
+.bin-button#deleteDrawn:active {
+  transform: scale(0.9);
+}
+
+.button#undoBtn {
+  position: absolute;
+  top: 10px;
+  left: 185px;
+  color: white;
+  background-color: black;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  line-height: 2rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  cursor: pointer;
+  text-align: center;
+  margin-right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  border: none;
+}
+
+.button#undoBtn:hover {
+  background-color: #333;
+}
+
+.button#undoBtn svg {
+  display: inline;
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-right: 0.75rem;
+  color: white;
+}
+
+.button#undoBtn:focus svg {
+  animation: spin_357 0.5s linear;
+}
+
+@keyframes spin_357 {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

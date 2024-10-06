@@ -1,5 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+
 
 // Setup the renderer
 const renderer = new THREE.WebGLRenderer();
@@ -125,23 +129,23 @@ function onMouseDown(event) {
       const intersections = raycaster.intersectObjects(scene.children, true);
 
       if (intersections.length > 0) {
-          const selectedObject = intersections[0].object;
-          const index = selectedObjects.indexOf(selectedObject);
-
+        const selectedObject = intersections[0].object;
+         // Ignore the line object in the selection process
+        if (selectedObject.name === 'drawingLine') {
+          console.log('Line was selected, ignoring it.');
+          return; // Skip if the line itself is clicked
+        }
+        const index = selectedObjects.indexOf(selectedObject);
           if (index === -1) {
-              selectedObjects.push(selectedObject);
-              const color = new THREE.Color(Math.random(), Math.random(), Math.random());
-              selectedObject.material.color = color;
-              console.log(`${selectedObject.name} was selected!`);
-              const point = intersections[0].point; // Get clicked point
-              linePoints.push(point);
-          } else {
-              selectedObjects.splice(index, 1);
-              selectedObject.material.color.set(0xffffff); // Resetting to default color
-              console.log(`${selectedObject.name} was deselected!`);
-          }
-          // Draw the line when object selection is enabled
-          drawLine();
+            selectedObjects.push(selectedObject);
+            const color = new THREE.Color(Math.random(), Math.random(), Math.random());
+            selectedObject.material.color = color;
+            console.log(`${selectedObject.name} was selected!`);
+          } 
+          const point = intersections[0].point; // Get clicked point
+          console.log(`Clicked point coordinates: x=${point.x}, y=${point.y}, z=${point.z}`);
+          linePoints.push(point);
+          drawLine(0xcdf0f1, 5);
           printSelectedObjects();
       }
   } else {
@@ -149,20 +153,55 @@ function onMouseDown(event) {
   }
 }
 
-function drawLine(){
+function drawLine(lineColor = 0xcdf0f1, lineThickness = 5) {
   const geometry = new THREE.BufferGeometry().setFromPoints(linePoints);
-  const material = new THREE.LineBasicMaterial({color: 0xff0000});
+  
+  // Create material with variable color and thickness
+  const material = new THREE.LineBasicMaterial({ 
+      color: lineColor, 
+      linewidth: lineThickness 
+  });
+
   line = new THREE.Line(geometry, material);
 
-  // Femove the previous line if it exists
-  if(scene.getObjectByName('drawingLine')){
-    scene.remove(scene.getObjectByName('drawingLine'));
+  // Set raycast to null so the line itself cannot be selected
+  line.raycast = () => {};
+
+  // Remove the previous line if it exists
+  if (scene.getObjectByName('drawingLine')) {
+      scene.remove(scene.getObjectByName('drawingLine'));
   }
-  line.name = 'drawingLine'; // Set a name for easy removal later
+
+  line.name = 'drawingLine'; // Set a name for easy identification and removal later
   scene.add(line); // Add the line to the scene
 }
 
 function printSelectedObjects(){
   const selectedNames = selectedObjects.map(obj => obj.name);
-  console.log('Selected Objects', selectedNames);
+  //console.log('Selected Objects', selectedNames);
 }
+
+function deleteDrawnLine() {
+  const drawnLine = scene.getObjectByName('drawingLine'); // Find the line by name
+  if (drawnLine) {
+      scene.remove(drawnLine); // Remove the line from the scene
+      console.log('Drawn line was deleted!');
+      linePoints.length = 0; // Clear the linePoints array
+  } else {
+      console.log('No line to delete.');
+  }
+}
+document.getElementById('deleteDrawn').addEventListener('click', deleteDrawnLine);
+
+// Function to undo the last point
+function undoLastPoint() {
+  if (linePoints.length > 0) {
+      linePoints.pop(); // Remove the last point from the array
+      console.log('Last point undone.');
+      drawLine(); // Redraw the line with the updated points
+  } else {
+      console.log('No points to undo.');
+  }
+}
+// Add an event listener to the Undo button
+document.getElementById('undoBtn').addEventListener('click', undoLastPoint);
